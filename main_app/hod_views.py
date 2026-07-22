@@ -99,9 +99,13 @@ def add_staff(request):
             password = form.cleaned_data.get('password')
             course = form.cleaned_data.get('course')
             passport = request.FILES.get('profile_pic')
-            fs = FileSystemStorage()
-            filename = fs.save(passport.name, passport)
-            passport_url = fs.url(filename)
+
+            passport_url = ""
+
+            if passport:
+             fs = FileSystemStorage()
+             filename = fs.save(passport.name, passport)
+             passport_url = fs.url(filename)
             try:
                 user = CustomUser.objects.create_user(
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
@@ -241,7 +245,7 @@ def manage_subject(request):
 
 
 def edit_staff(request, staff_id):
-    staff = get_object_or_404(Staff, id=staff_id)
+    staff = get_object_or_404(Staff, pk=staff_id)
     form = StaffForm(request.POST or None, instance=staff)
     context = {
         'form': form,
@@ -284,9 +288,19 @@ def edit_staff(request, staff_id):
         else:
             messages.error(request, "Please fil form properly")
     else:
-        user = CustomUser.objects.get(id=staff_id)
-        staff = Staff.objects.get(id=user.id)
-        return render(request, "hod_template/edit_staff_template.html", context)
+     form = StaffForm(instance=staff)
+
+     context = {
+        'form': form,
+        'staff_id': staff_id,
+        'page_title': 'Edit Staff'
+    }
+
+    return render(
+        request,
+        "hod_template/edit_staff_template.html",
+        context
+    )
 
 
 def edit_student(request, student_id):

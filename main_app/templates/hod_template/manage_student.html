@@ -1,60 +1,1444 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block page_title %}
+{{ page_title }}
+{% endblock page_title %}
 
 {% block content %}
 
 <section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body" style="overflow-x: auto; overflow-y: auto; max-height: 600px;">
-                        <table id="example2" class="table table-bordered table-hover" style="min-width: 800px;">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Full Name</th>
-                                    <th>Email</th>
-                                    <th>Gender</th>
-                                    <th>Course</th>
-                                    <th>Avatar</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for student in students %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{student.last_name}}, {{student.first_name}}</td>
-                                    <td>{{student.email}}</td>
-                                    <td>{{student.gender}}</td>
-                                    <td>{{student.student.course.name}}</td>
-                                    <td>
-                                        {% if student.profile_pic == ""  %}
-                                        No Image
-                                        {% else %}
-                                        <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{student.profile_pic}}" alt="">
-                                        {% endif %}
-                                    </td>
-                                    
-                                    <td><a href="{% url 'edit_student' student.student.id %}" class="btn btn-info">Edit</a> -
-                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
 
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+    <div class="container-fluid">
+{% if messages %}
+
+<div class="row">
+
+    <div class="col-12">
+
+        {% for message in messages %}
+
+        <div class="alert
+            {% if message.tags == 'success' %}
+                alert-success
+            {% elif message.tags == 'error' %}
+                alert-danger
+            {% elif message.tags == 'warning' %}
+                alert-warning
+            {% else %}
+                alert-info
+            {% endif %}
+            alert-dismissible fade show shadow-sm">
+
+            <i class="
+                {% if message.tags == 'success' %}
+                    fas fa-check-circle
+                {% elif message.tags == 'error' %}
+                    fas fa-times-circle
+                {% elif message.tags == 'warning' %}
+                    fas fa-exclamation-triangle
+                {% else %}
+                    fas fa-info-circle
+                {% endif %}
+            "></i>
+
+            {{ message }}
+
+            <button
+                type="button"
+                class="close"
+                data-dismiss="alert">
+
+                <span>&times;</span>
+
+            </button>
+
         </div>
+
+        {% endfor %}
+
     </div>
+
+</div>
+
+{% endif %}
+        <!-- Page Header -->
+
+        <div class="row mb-4">
+
+            <div class="col-lg-8">
+
+                <h2 class="font-weight-bold mb-1">
+
+                    <i class="fas fa-user-graduate text-primary"></i>
+
+                    Student Management
+
+                </h2>
+
+                <p class="text-muted">
+
+                    Manage all students from one place.
+
+                </p>
+
+            </div>
+
+            <div class="col-lg-4 text-lg-right text-left mt-3 mt-lg-0">
+
+                <a href="{% url 'add_student' %}"
+                   class="btn btn-primary btn-lg shadow">
+
+                    <i class="fas fa-plus-circle"></i>
+
+                    Add Student
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Statistics -->
+
+        <div class="row">
+
+            <div class="col-md-3 col-sm-6">
+
+                <div class="small-box bg-primary">
+
+                    <div class="inner">
+
+    <h3 class="mb-2">
+
+        {{ students|length }}
+
+    </h3>
+
+    <p class="mb-0">
+
+        Total Students
+
+    </p>
+
+</div>
+
+                    <div class="icon">
+
+                        <i class="fas fa-users"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+
+                <div class="small-box bg-success">
+
+                    <div class="inner">
+
+                        <h3>{{ students|length }}</h3>
+
+                        <p>Registered</p>
+
+                    </div>
+
+                    <div class="icon">
+
+                        <i class="fas fa-user-check"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+
+                <div class="small-box bg-warning">
+
+                    <div class="inner">
+
+                        <h3>ERP</h3>
+
+                        <p>Smart System</p>
+
+                    </div>
+
+                    <div class="icon">
+
+                        <i class="fas fa-school"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+
+                <div class="small-box bg-danger">
+
+                    <div class="inner">
+
+                        <h3>Students</h3>
+
+                        <p>Module</p>
+
+                    </div>
+
+                    <div class="icon">
+
+                        <i class="fas fa-chart-line"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Main Card -->
+
+        <div class="card shadow-lg border-0">
+
+            <div class="card-header bg-primary">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h3 class="card-title text-white mb-0">
+
+                        <i class="fas fa-list"></i>
+
+                        Student List
+
+                    </h3>
+
+                    <span class="badge badge-light">
+
+                        {{ students|length }} Students
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <!-- Search -->
+
+                <div class="row mb-4">
+
+                    <div class="col-md-6">
+
+                        <input
+                            type="text"
+                            id="studentSearch"
+                            class="form-control"
+                            placeholder="Search student by name, email or course...">
+
+                    </div>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table
+                        id="example2"
+                        class="table table-hover align-middle">
+                        <thead class="thead-light">
+
+    <tr>
+
+        <th width="60">#</th>
+
+        <th>Student</th>
+
+        <th>Email</th>
+
+        <th>Gender</th>
+
+        <th>Course</th>
+
+        <th class="text-center">Photo</th>
+
+        <th class="text-center" width="170">Actions</th>
+
+    </tr>
+
+</thead>
+
+<tbody id="studentTable">
+
+{% for student in students %}
+
+<tr>
+
+    <td>
+
+        <span class="badge badge-primary">
+
+            {{ forloop.counter }}
+
+        </span>
+
+    </td>
+
+    <td>
+
+        <div class="d-flex align-items-center">
+
+            {% if student.profile_pic %}
+
+        <img src="{{ student.profile_pic }}"
+     class="rounded-circle shadow"
+     width="50"
+     height="50"
+     style="object-fit:cover;">
+
+            {% else %}
+
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3"
+                 style="width:55px;height:55px;">
+
+                <i class="fas fa-user-graduate"></i>
+
+            </div>
+
+            {% endif %}
+
+            <div class="student-info">
+
+    <h6 class="student-name mb-1">
+
+        {{ student.first_name }} {{ student.last_name }}
+
+    </h6>
+
+    <small class="student-id">
+
+        Student ID: {{ student.student.id }}
+
+    </small>
+
+</div>
+
+        </div>
+
+    </td>
+
+    <td>
+
+        <a href="mailto:{{ student.email }}">
+
+            {{ student.email }}
+
+        </a>
+
+    </td>
+
+    <td>
+
+        {% if student.gender == "Male" %}
+
+        <span class="badge badge-info">
+
+            <i class="fas fa-mars"></i>
+
+            Male
+
+        </span>
+
+        {% else %}
+
+        <span class="badge badge-danger">
+
+            <i class="fas fa-venus"></i>
+
+            Female
+
+        </span>
+
+        {% endif %}
+
+    </td>
+
+    <td>
+
+        <span class="badge badge-success">
+
+            {{ student.student.course.name }}
+
+        </span>
+
+    </td>
+
+    <td class="text-center">
+
+        {% if student.profile_pic %}
+
+        <img src="{{ student.profile_pic }}"
+             width="50"
+             height="50"
+             class="rounded-circle shadow"
+             style="object-fit:cover;">
+
+        {% else %}
+
+        <span class="badge badge-secondary">
+
+            No Photo
+
+        </span>
+
+        {% endif %}
+
+    </td>
+
+    <td class="text-center">
+
+        <a href="{% url 'edit_student' student.student.id %}"
+           class="btn btn-warning btn-sm">
+
+            <i class="fas fa-edit"></i>
+
+        </a>
+
+        <button
+            class="btn btn-danger btn-sm"
+            data-toggle="modal"
+            data-target="#deleteModal{{ student.student.id }}">
+
+            <i class="fas fa-trash"></i>
+
+        </button>
+
+    </td>
+
+</tr>
+<!-- Delete Modal -->
+
+<div class="modal fade"
+     id="deleteModal{{ student.student.id }}"
+     tabindex="-1"
+     role="dialog">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5 class="modal-title">
+
+                    <i class="fas fa-exclamation-triangle"></i>
+
+                    Delete Student
+
+                </h5>
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+            <div class="modal-body text-center">
+
+                {% if student.profile_pic %}
+
+                <img src="{{ student.profile_pic }}"
+                     width="90"
+                     height="90"
+                     class="rounded-circle shadow mb-3"
+                     style="object-fit:cover;">
+
+                {% endif %}
+
+                <h5>
+
+                    {{ student.first_name }}
+                    {{ student.last_name }}
+
+                </h5>
+
+                <p class="text-muted">
+
+                    {{ student.email }}
+
+                </p>
+
+                <hr>
+
+                <p>
+
+                    Are you sure you want to permanently delete this student?
+
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-secondary"
+                        data-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+                <a href="{% url 'delete_student' student.student.id %}"
+                   class="btn btn-danger">
+
+                    <i class="fas fa-trash"></i>
+
+                    Delete
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% empty %}
+
+<tr>
+
+    <td colspan="7">
+
+        <div class="text-center py-5">
+
+            <i class="fas fa-user-graduate fa-4x text-muted mb-3"></i>
+
+            <h4>
+
+                No Students Found
+
+            </h4>
+
+            <p class="text-muted">
+
+                There are no students available.
+
+            </p>
+
+            <a href="{% url 'add_student' %}"
+               class="btn btn-primary">
+
+                <i class="fas fa-plus"></i>
+
+                Add First Student
+
+            </a>
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </section>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const search = document.getElementById("studentSearch");
+    const table = document.getElementById("studentTable");
+
+    if (!search || !table) return;
+
+    search.addEventListener("keyup", function () {
+
+        let value = this.value.toLowerCase();
+
+        let rows = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+
+            let text = rows[i].innerText.toLowerCase();
+
+            if (text.indexOf(value) > -1) {
+
+                rows[i].style.display = "";
+
+            } else {
+
+                rows[i].style.display = "none";
+
+            }
+
+        }
+
+    });
+
+});
+
+</script>
+<style>
+/* Small Box Fix */
+
+.small-box{
+
+    min-height:170px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    position:relative;
+    overflow:hidden;
+    padding:20px;
+
+}
+
+.small-box .inner{
+
+    position:relative;
+    z-index:2;
+    width:100%;
+
+}
+
+.small-box .inner h3{
+
+    font-size:34px;
+    font-weight:700;
+    line-height:1;
+    margin-bottom:15px;
+    color:#111;
+
+}
+
+.small-box .inner p{
+
+    font-size:16px;
+    font-weight:500;
+    margin:0;
+    color:#222;
+
+}
+
+.small-box .icon{
+
+    position:absolute;
+    right:20px;
+    bottom:20px;
+    font-size:70px;
+    opacity:.18;
+    z-index:1;
+
+}
+
+.small-box .icon i{
+
+    font-size:70px;
+
+}
+.table td{
+
+    vertical-align:middle !important;
+
+}
+
+.student-info{
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+}
+
+.student-name{
+
+    font-weight:600;
+    margin:0;
+
+}
+
+.student-id{
+
+    color:#6c757d;
+    font-size:13px;
+
+}
+.table td{
+
+    vertical-align:middle !important;
+
+}
+
+.student-info{
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+}
+
+.student-name{
+
+    font-weight:600;
+    margin:0;
+
+}
+
+.student-id{
+
+    color:#6c757d;
+    font-size:13px;
+
+}.table td{
+
+    vertical-align:middle !important;
+
+}
+
+.student-info{
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+}
+
+.student-name{
+
+    font-weight:600;
+    margin:0;
+
+}
+
+.student-id{
+
+    color:#6c757d;
+    font-size:13px;
+
+}
+.table td{
+
+    vertical-align:middle !important;
+
+}
+
+.student-info{
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+}
+
+.student-name{
+
+    font-weight:600;
+    margin:0;
+
+}
+
+.student-id{
+
+    color:#6c757d;
+    font-size:13px;
+
+}
+
+/* ===========================
+   Student Management UI
+=========================== */
+
+.content{
+
+    animation:fadeIn .5s ease;
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+.card{
+
+    border:none;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.card-header{
+
+    background:linear-gradient(135deg,#4F46E5,#2563EB);
+
+    border:none;
+
+}
+
+.card-title{
+
+    font-weight:600;
+
+}
+
+.table{
+
+    margin-bottom:0;
+
+}
+
+.table thead th{
+
+    background:#f8f9fa;
+
+    color:#4F46E5;
+
+    font-weight:600;
+
+    border-top:none;
+
+    border-bottom:2px solid #e9ecef;
+
+}
+
+.table tbody tr{
+
+    transition:.3s;
+
+}
+
+.table tbody tr:hover{
+
+    background:#f8fbff;
+
+    transform:scale(1.01);
+
+}
+
+.table td{
+
+    vertical-align:middle;
+
+}
+
+.rounded-circle{
+
+    border:3px solid white;
+
+    transition:.3s;
+
+}
+
+.rounded-circle:hover{
+
+    transform:scale(1.08);
+
+}
+
+.btn{
+
+    border-radius:10px;
+
+    transition:.3s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.badge{
+
+    padding:8px 12px;
+
+    border-radius:30px;
+
+    font-size:12px;
+
+}
+
+#studentSearch{
+
+    border-radius:12px;
+
+    height:48px;
+
+    border:1px solid #ddd;
+
+}
+
+#studentSearch:focus{
+
+    box-shadow:0 0 0 .2rem rgba(79,70,229,.2);
+
+    border-color:#4F46E5;
+
+}
+/* ===========================
+   Statistics Cards
+=========================== */
+
+.small-box{
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    transition:.35s;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+}
+
+.small-box:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 18px 40px rgba(0,0,0,.15);
+
+}
+
+.small-box .icon{
+
+    transition:.4s;
+
+}
+
+.small-box:hover .icon{
+
+    transform:scale(1.15) rotate(8deg);
+
+}
+
+.small-box h3{
+
+    font-weight:700;
+
+    font-size:34px;
+
+}
+
+.small-box p{
+
+    font-size:15px;
+
+}
+
+/* ===========================
+   Table
+=========================== */
+
+.table-responsive{
+
+    border-radius:15px;
+
+}
+
+.table tbody td{
+
+    padding:16px;
+
+}
+
+.table a{
+
+    text-decoration:none;
+
+}
+
+.table a:hover{
+
+    text-decoration:underline;
+
+}
+
+.table tbody tr{
+
+    border-bottom:1px solid #f0f0f0;
+
+}
+
+/* ===========================
+   Buttons
+=========================== */
+
+.btn-primary{
+
+    box-shadow:0 5px 18px rgba(13,110,253,.25);
+
+}
+
+.btn-success{
+
+    box-shadow:0 5px 18px rgba(25,135,84,.25);
+
+}
+
+.btn-warning{
+
+    color:white;
+
+}
+
+.btn-warning:hover{
+
+    background:#f59e0b;
+
+    color:white;
+
+}
+
+.btn-danger:hover{
+
+    background:#dc2626;
+
+}
+
+/* ===========================
+   Modal
+=========================== */
+
+.modal-content{
+
+    border:none;
+
+    border-radius:18px;
+
+}
+
+.modal-header{
+
+    border-bottom:none;
+
+}
+
+.modal-footer{
+
+    border-top:none;
+
+}
+
+/* ===========================
+   Search
+=========================== */
+
+#studentSearch{
+
+    transition:.3s;
+
+}
+
+#studentSearch:hover{
+
+    border-color:#4F46E5;
+
+}
+
+/* ===========================
+   Scrollbar
+=========================== */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+    height:8px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#4F46E5;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#ececec;
+
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:992px){
+
+    .small-box{
+
+        margin-bottom:20px;
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .table{
+
+        min-width:900px;
+
+    }
+
+    .card-title{
+
+        font-size:18px;
+
+    }
+
+    .small-box h3{
+
+        font-size:28px;
+
+    }
+
+    .btn{
+
+        margin-bottom:5px;
+
+    }
+
+}
+
+@media (max-width:576px){
+
+    h2{
+
+        font-size:24px;
+
+    }
+
+}
+/* ===========================
+   Badges
+=========================== */
+
+.badge-primary{
+
+    background:#4F46E5;
+
+}
+.badge-success{
+
+    padding:8px 14px;
+    font-size:12px;
+    border-radius:25px;
+    white-space:nowrap;
+
+}
+.badge-success{
+
+    background:#10B981;
+
+}
+
+.badge-danger{
+
+    background:#EF4444;
+
+}
+
+.badge-info{
+
+    background:#06B6D4;
+
+}
+
+.badge-secondary{
+
+    background:#6B7280;
+
+}
+
+.badge-light{
+
+    color:#111827;
+
+}
+.badge-danger,
+.badge-info{
+
+    min-width:70px;
+    text-align:center;
+
+}
+.btn-group{
+
+    display:flex;
+    justify-content:center;
+    gap:8px;
+
+}
+
+.btn-sm{
+
+    width:40px;
+    height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+
+}
+.rounded-circle{
+
+    width:55px;
+    height:55px;
+    object-fit:cover;
+    border:3px solid #fff;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+}
+.rounded-circle{
+
+    width:55px;
+    height:55px;
+    object-fit:cover;
+    border:3px solid #fff;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+}
+.btn-group{
+
+    display:flex;
+    justify-content:center;
+    gap:8px;
+
+}
+
+.btn-sm{
+
+    width:40px;
+    height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+
+}
+.rounded-circle{
+
+    width:55px;
+    height:55px;
+    object-fit:cover;
+    border:3px solid #fff;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+}
+#studentSearch{
+
+    width:420px;
+    max-width:100%;
+    height:48px;
+    border-radius:12px;
+
+}
+/* ===========================
+   Avatar Animation
+=========================== */
+
+.rounded-circle{
+
+    cursor:pointer;
+
+}
+
+.rounded-circle:hover{
+
+    transform:scale(1.12);
+
+    box-shadow:0 10px 25px rgba(0,0,0,.18);
+
+}
+
+/* ===========================
+   Action Buttons
+=========================== */
+
+.btn-sm{
+
+    min-width:42px;
+
+}
+
+.btn i{
+
+    margin-right:3px;
+
+}
+
+/* ===========================
+   Empty State
+=========================== */
+
+.fa-user-graduate{
+
+    opacity:.55;
+
+}
+/* ===========================
+   Alerts
+=========================== */
+
+.alert{
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:16px 20px;
+
+    animation:fadeIn .4s ease;
+
+}
+
+.alert i{
+
+    margin-right:10px;
+
+}
+/* Statistics Fix */
+
+.small-box .inner h3{
+
+    font-size:32px !important;
+    line-height:1.2;
+    white-space:nowrap;
+
+}
+
+.small-box .inner p{
+
+    font-size:15px;
+    margin-top:10px;
+
+}
+
+.small-box{
+
+    min-height:150px;
+
+}
+
+.small-box .icon{
+
+    top:25px;
+
+    right:20px;
+
+}
+
+.small-box .icon i{
+
+    font-size:60px;
+
+    opacity:.25;
+
+}
+</style>
+<script>
+
+$(function () {
+
+    $("#example2").DataTable({
+
+        responsive:true,
+
+        autoWidth:false,
+
+        pageLength:10,
+
+        lengthMenu:[
+            [10,25,50,100,-1],
+            [10,25,50,100,"All"]
+        ],
+
+        ordering:true,
+
+        searching:true,
+
+        info:true,
+
+        paging:true,
+
+        language:{
+
+            search:"Search :",
+
+            lengthMenu:"Show _MENU_ students",
+
+            zeroRecords:"No matching student found",
+
+            info:"Showing _START_ to _END_ of _TOTAL_ students",
+
+            infoEmpty:"No students available",
+
+            paginate:{
+
+                previous:"Previous",
+
+                next:"Next"
+
+            }
+
+        }
+
+    });
+
+});
+
+</script>
+<script>
+
+setTimeout(function(){
+
+    $(".alert").fadeOut("slow");
+
+},4000);
+
+</script>
+
 {% endblock content %}

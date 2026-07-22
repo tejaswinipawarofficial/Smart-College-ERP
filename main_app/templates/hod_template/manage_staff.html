@@ -1,60 +1,502 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block page_title %}{{ page_title }}{% endblock page_title %}
 
 {% block content %}
 
+<style>
+:root{
+    --primary:#4F46E5;
+    --secondary:#2563EB;
+    --success:#10B981;
+    --danger:#EF4444;
+    --warning:#F59E0B;
+    --bg:#F8FAFC;
+    --text:#1F2937;
+    --border:#E5E7EB;
+}
+
+.content{
+    background:var(--bg);
+    padding:20px;
+}
+
+.stats-card{
+    border:none;
+    border-radius:18px;
+    color:#fff;
+    overflow:hidden;
+    position:relative;
+    transition:.3s;
+    margin-bottom:20px;
+}
+
+.stats-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+.stats-card .card-body{
+    padding:22px;
+}
+
+.stats-card h3{
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.stats-card p{
+    margin:0;
+    opacity:.95;
+}
+
+.stats-card .icon{
+    position:absolute;
+    right:20px;
+    bottom:15px;
+    font-size:65px;
+    opacity:.18;
+}
+
+.bg-primary-gradient{
+    background:linear-gradient(135deg,#4F46E5,#2563EB);
+}
+
+.bg-success-gradient{
+    background:linear-gradient(135deg,#10B981,#059669);
+}
+
+.bg-warning-gradient{
+    background:linear-gradient(135deg,#F59E0B,#D97706);
+}
+
+.bg-danger-gradient{
+    background:linear-gradient(135deg,#EF4444,#DC2626);
+}
+
+.staff-card{
+    border:none;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+}
+
+.staff-card .card-header{
+    background:#fff;
+    border:none;
+    padding:20px 25px;
+}
+
+.staff-card .card-title{
+    font-weight:700;
+    color:var(--text);
+}
+
+.search-box{
+    margin-bottom:20px;
+}
+
+.search-box input{
+    border-radius:12px;
+    height:48px;
+    border:1px solid var(--border);
+    padding-left:18px;
+}
+
+.search-box input:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(79,70,229,.12);
+}
+
+.table-modern thead{
+    background:var(--primary);
+    color:#fff;
+}
+
+.table-modern th{
+    border:none;
+    vertical-align:middle;
+}
+
+.table-modern td{
+    vertical-align:middle;
+}
+
+.staff-info{
+    display:flex;
+    align-items:center;
+}
+
+.staff-avatar img{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-right:12px;
+    border:3px solid rgba(79,70,229,.12);
+}
+
+.staff-name{
+    font-weight:600;
+    color:#111827;
+}
+
+.staff-id{
+    font-size:13px;
+    color:#6B7280;
+}
+
+.badge-course{
+    background:#DCFCE7;
+    color:#166534;
+    padding:7px 12px;
+    border-radius:30px;
+    font-size:13px;
+}
+
+.btn-action{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin-right:5px;
+}
+
+.table-responsive{
+    overflow-x:auto;
+}
+</style>
+
 <section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body" style="overflow-x: auto; overflow-y: auto; max-height: 600px;">
-                        <table id="example2" class="table table-bordered table-hover" style="min-width: 800px;">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Full Name</th>
-                                    <th>Email</th>
-                                    <th>Gender</th>
-                                    <th>Course</th>
-                                    <th>Avatar</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for staff in allStaff %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{staff.last_name}}, {{staff.first_name}}</td>
-                                    <td>{{staff.email}}</td>
-                                    <td>{{staff.gender}}</td>
-                                    <td>{{staff.staff.course.name}}</td>
-                                    <td>
-                                        {% if staff.profile_pic == ""  %}
-                                        No Image
-                                        {% else %}
-                                        <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{staff.profile_pic}}" alt="">
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> - 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+
+<div class="container-fluid">
+
+<div class="row">
+
+<div class="col-lg-3 col-md-6">
+<div class="card stats-card bg-primary-gradient">
+<div class="card-body">
+<h3>{{ allStaff|length }}</h3>
+<p>Total Staff</p>
+<div class="icon">
+<i class="fas fa-user-tie"></i>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-lg-3 col-md-6">
+<div class="card stats-card bg-success-gradient">
+<div class="card-body">
+<h3>{{ allStaff|length }}</h3>
+<p>Faculty Members</p>
+<div class="icon">
+<i class="fas fa-chalkboard-teacher"></i>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-lg-3 col-md-6">
+<div class="card stats-card bg-warning-gradient">
+<div class="card-body">
+<h3>100%</h3>
+<p>Active Staff</p>
+<div class="icon">
+<i class="fas fa-user-check"></i>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-lg-3 col-md-6">
+<div class="card stats-card bg-danger-gradient">
+<div class="card-body">
+<h3>ERP</h3>
+<p>Smart College</p>
+<div class="icon">
+<i class="fas fa-university"></i>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<div class="card staff-card">
+
+<div class="card-header d-flex justify-content-between align-items-center">
+
+<h3 class="card-title mb-0">
+<i class="fas fa-user-tie text-primary mr-2"></i>
+Manage Staff
+</h3>
+
+<a href="{% url 'add_staff' %}" class="btn btn-primary">
+<i class="fas fa-plus"></i> Add Staff
+</a>
+
+</div>
+
+<div class="card-body">
+
+<div class="search-box">
+<input
+type="text"
+id="staffSearch"
+class="form-control"
+placeholder="Search by name, email or course...">
+</div>
+
+<div class="table-responsive">
+
+<table class="table table-hover table-modern" id="staffTable">
+
+<thead>
+
+<tr>
+
+<th>#</th>
+
+<th>Staff</th>
+
+<th>Email</th>
+
+<th>Gender</th>
+
+<th>Course</th>
+
+<th>Status</th>
+
+<th width="120">Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for staff in allStaff %}
+
+<tr>
+
+<td>{{ forloop.counter }}</td>
+
+<td>
+
+<div class="staff-info">
+
+<div class="staff-avatar">
+
+{% if staff.profile_pic %}
+<img src="{{ staff.profile_pic }}">
+{% else %}
+<img src="{% static 'dist/img/avatar.png' %}" alt="Avatar">
+{% endif %}
+
+</div>
+
+<div>
+
+<div class="staff-name">
+
+{{ staff.first_name }} {{ staff.last_name }}
+
+</div>
+
+<div class="staff-id">
+
+Faculty ID : {{ staff.staff.id }}
+
+</div>
+
+</div>
+
+</div>
+
+</td>
+
+<td>{{ staff.email }}</td>
+
+<td>
+
+{% if staff.gender == "M" or staff.gender == "Male" %}
+<span class="badge badge-primary">Male</span>
+{% else %}
+<span class="badge badge-danger">Female</span>
+{% endif %}
+</td>
+
+<td>
+
+<span class="badge-course">
+
+{{ staff.staff.course.name }}
+
+</span>
+
+</td>
+
+<td>
+
+{% if staff.is_active %}
+<span class="badge badge-success">Active</span>
+{% else %}
+<span class="badge badge-danger">Inactive</span>
+{% endif %}
+
+</td>
+
+<td>
+    <a href="{% url 'edit_staff' staff.staff.id %}"
+   class="btn btn-primary btn-action"
+   title="Edit Staff">
+    <i class="fas fa-edit"></i>
+</a>
+
+<button
+    type="button"
+    class="btn btn-danger btn-action"
+    data-toggle="modal"
+    data-target="#deleteModal{{ staff.staff.id }}"
+    title="Delete Staff">
+    <i class="fas fa-trash"></i>
+</button>
+
+</td>
+
+</tr>
+
+<!-- Delete Modal -->
+<div class="modal fade"
+     id="deleteModal{{ staff.staff.id }}"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Delete Staff
+                </h5>
+
+                <button type="button"
+                        class="close text-white"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
             </div>
+
+            <div class="modal-body text-center">
+
+                <i class="fas fa-user-times fa-3x text-danger mb-3"></i>
+
+                <h5>
+
+                    Are you sure you want to delete
+
+                    <br><br>
+
+                    <strong>
+
+                        {{ staff.first_name }} {{ staff.last_name }}
+
+                    </strong>
+
+                    ?
+
+                </h5>
+
+                <p class="text-muted">
+
+                    This action cannot be undone.
+
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+                <a href="{% url 'delete_staff' staff.staff.id %}"
+                   class="btn btn-danger">
+
+                    <i class="fas fa-trash mr-1"></i>
+
+                    Delete
+
+                </a>
+
+            </div>
+
         </div>
+
     </div>
+
+</div>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </section>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const search=document.getElementById("staffSearch");
+
+search.addEventListener("keyup",function(){
+
+let value=this.value.toLowerCase();
+
+let rows=document.querySelectorAll("#staffTable tbody tr");
+
+rows.forEach(function(row){
+
+row.style.display=row.innerText.toLowerCase().includes(value)
+?"":"none";
+
+});
+
+});
+
+});
+$(function () {
+    $("#staffTable").DataTable({
+        responsive: true,
+        autoWidth: false,
+        pageLength: 10
+    });
+});
+</script>
+
 {% endblock content %}
