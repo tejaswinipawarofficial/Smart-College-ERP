@@ -163,5 +163,5 @@ EMAIL_HOST_PASSWORD = os.environ.get('sshswdwuwaokhghd')
 EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = "School Management System <admin@admin.com>"
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
